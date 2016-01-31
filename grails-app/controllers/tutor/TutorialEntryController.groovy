@@ -10,7 +10,7 @@ class TutorialEntryController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond TutorialEntry.list(params), model:[tutorialEntryCount: TutorialEntry.count()]
+        respond TutorialEntry.list(params), model: [tutorialEntryCount: TutorialEntry.count()]
     }
 
     def show(TutorialEntry tutorialEntry) {
@@ -19,6 +19,27 @@ class TutorialEntryController {
 
     def create() {
         respond new TutorialEntry(params)
+    }
+
+    def previous() {
+        def entry = TutorialEntry.get(params.id)
+        if (entry.predecessor) {
+            entry = entry.predecessor
+        } else {
+            flash.message = "Top of tutorials reached."
+        }
+        redirect(action: show, id: entry.id)
+    }
+
+    def next = {
+        def entry = TutorialEntry.get(params.id)
+        def nextEntry = TutorialEntry.findByPredecessor(entry)
+        if (nextEntry) {
+            entry = nextEntry
+        } else {
+            flash.message = "End of tutorials reached."
+        }
+        redirect action: show, id: entry.id
     }
 
     @Transactional
@@ -31,11 +52,11 @@ class TutorialEntryController {
 
         if (tutorialEntry.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond tutorialEntry.errors, view:'create'
+            respond tutorialEntry.errors, view: 'create'
             return
         }
 
-        tutorialEntry.save flush:true
+        tutorialEntry.save flush: true
 
         request.withFormat {
             form multipartForm {
@@ -60,18 +81,18 @@ class TutorialEntryController {
 
         if (tutorialEntry.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond tutorialEntry.errors, view:'edit'
+            respond tutorialEntry.errors, view: 'edit'
             return
         }
 
-        tutorialEntry.save flush:true
+        tutorialEntry.save flush: true
 
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'tutorialEntry.label', default: 'TutorialEntry'), tutorialEntry.id])
                 redirect tutorialEntry
             }
-            '*'{ respond tutorialEntry, [status: OK] }
+            '*' { respond tutorialEntry, [status: OK] }
         }
     }
 
@@ -84,14 +105,14 @@ class TutorialEntryController {
             return
         }
 
-        tutorialEntry.delete flush:true
+        tutorialEntry.delete flush: true
 
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'tutorialEntry.label', default: 'TutorialEntry'), tutorialEntry.id])
-                redirect action:"index", method:"GET"
+                redirect action: "index", method: "GET"
             }
-            '*'{ render status: NO_CONTENT }
+            '*' { render status: NO_CONTENT }
         }
     }
 
@@ -101,7 +122,7 @@ class TutorialEntryController {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'tutorialEntry.label', default: 'TutorialEntry'), params.id])
                 redirect action: "index", method: "GET"
             }
-            '*'{ render status: NOT_FOUND }
+            '*' { render status: NOT_FOUND }
         }
     }
 }

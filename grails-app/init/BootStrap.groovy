@@ -14,12 +14,14 @@ class BootStrap {
         )
         root.save()
 
+        def previous=root
         for (i in 1..5) {
             def entry = new TutorialEntry(
                     title: "1.$i Some Title",
                     text: "a very long tex " * i,
                     author: joshua,
-                    parentEntry: root
+                    parentEntry: root,
+                    predecessor: previous
             )
             entry.save()
         }

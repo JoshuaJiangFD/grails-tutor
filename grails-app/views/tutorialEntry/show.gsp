@@ -20,6 +20,12 @@
             <div class="message" role="status">${flash.message}</div>
             </g:if>
             <f:display bean="tutorialEntry" />
+            <div class="nav">
+                <ul>
+                    <li><span class="menuButton"><g:link action="previous" id="${tutorialEntry?.id}">Previous</g:link></span></li>
+                    <li><span class="menuButton"><g:link action="next" id="${tutorialEntry?.id}">Next</g:link></span></li>
+                </ul>
+            </div>
             <g:form resource="${this.tutorialEntry}" method="DELETE">
                 <fieldset class="buttons">
                     <g:link class="edit" action="edit" resource="${this.tutorialEntry}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
